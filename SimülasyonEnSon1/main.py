@@ -2,15 +2,14 @@ import pygame
 import sys
 import time
 
-
 pygame.init()
 
-#Penceremiz
+# Penceremiz
 genislik = 1600
 yukseklik = 850
 pencere = pygame.display.set_mode((genislik, yukseklik))
 
-#RENKLER
+# RENKLER
 arkaplan = (139, 169, 119)
 pastel_pink = (255, 182, 193)
 brown = (80, 40, 10)
@@ -33,33 +32,26 @@ pink = (255, 192, 203)  # Pembe
 havuz_mavisi = (0, 191, 255)  # MERKEZ DAİRE
 stone_light = (169, 169, 169)  # Taşlı yol için açık gri
 stone_dark = (105, 105, 105)  # Taşlı yol için koyu gri
-small_building_color = (200,200,200)
-building_color=(150,150,150)
-
+small_building_color = (200, 200, 200)
+building_color = (150, 150, 150)
+sensor_yayagecidi = (175, 175, 175)
+sensor_trafikisigi = (185, 185, 185)
 
 # Yazı tipi ayarları
 font = pygame.font.Font(None, 20)
 garage_font = pygame.font.Font(None, 18)
 
-
-#EKLENEN RESİMLER
+# EKLENEN RESİMLER
 cop_kutusu = pygame.image.load("cop_kutusu.png")
 agac = pygame.image.load("agac.png")
-kazi_alani=pygame.image.load("kazi_alani.png")
-yolengel=pygame.image.load("yolengel.png")
-isci=pygame.image.load("amele.png")
+kazi_alani = pygame.image.load("kazi_alani.png")
+yolengel = pygame.image.load("yolengel.png")
+isci = pygame.image.load("amele.png")
+vinc = pygame.image.load("vinc.png")
 
 
-
-
-
-
-
-
-
-
-#BAŞLANGIÇ NOKTAMIZ OLAN GARJIMIZ VE GÜZEL EVİMİZ
-#Home sweet home...
+# BAŞLANGIÇ NOKTAMIZ OLAN GARJIMIZ VE GÜZEL EVİMİZ
+# Home sweet home...
 # Ev çizim fonksiyonu
 def draw_house(x, y):
     house_width, house_height = 75, 75  # Küçültülmüş ev boyutları
@@ -75,13 +67,17 @@ def draw_house(x, y):
     # Perdeler
     pygame.draw.rect(pencere, cornice_color, (left_window.x - 2, left_window.y - 5, window_size + 4, 5))
     pygame.draw.rect(pencere, cornice_color, (right_window.x - 2, right_window.y - 5, window_size + 4, 5))
-    pygame.draw.rect(pencere, curtain_color_1, (left_window.x + 2, left_window.y + 2, window_size - 4, window_size // 2))
-    pygame.draw.rect(pencere, curtain_color_2, (left_window.x + 2, left_window.y + window_size // 2 + 2, window_size - 4, window_size // 2))
-    pygame.draw.rect(pencere, curtain_color_1, (right_window.x + 2, right_window.y + 2, window_size - 4, window_size // 2))
-    pygame.draw.rect(pencere, curtain_color_2, (right_window.x + 2, right_window.y + window_size // 2 + 2, window_size - 4, window_size // 2))
+    pygame.draw.rect(pencere, curtain_color_1,
+                     (left_window.x + 2, left_window.y + 2, window_size - 4, window_size // 2))
+    pygame.draw.rect(pencere, curtain_color_2,
+                     (left_window.x + 2, left_window.y + window_size // 2 + 2, window_size - 4, window_size // 2))
+    pygame.draw.rect(pencere, curtain_color_1,
+                     (right_window.x + 2, right_window.y + 2, window_size - 4, window_size // 2))
+    pygame.draw.rect(pencere, curtain_color_2,
+                     (right_window.x + 2, right_window.y + window_size // 2 + 2, window_size - 4, window_size // 2))
 
 
-#SİMÜLASYON BAŞLANGIÇ NOKTASI
+# SİMÜLASYON BAŞLANGIÇ NOKTASI
 # Araba Garajı çizim fonksiyonu
 def draw_garage(x, y):
     garage_width, garage_height = 60, 45  # Küçültülmüş garaj boyutları
@@ -94,7 +90,7 @@ def draw_garage(x, y):
     pencere.blit(text, text_rect)
 
 
-#SİMÜLASYON BİTİŞ NOKTASI
+# SİMÜLASYON BİTİŞ NOKTASI
 # Büyük işyeri binası çizim fonksiyonu
 def draw_large_building(x, y):
     building_width, building_height = 90, 112  # Küçültülmüş boyutlar
@@ -107,8 +103,9 @@ def draw_large_building(x, y):
         for j in range(3):
             pygame.draw.rect(pencere, black, (x + 11 + i * 22, y + 15 + j * 30, 11, 11), 2)
 
+        # Küçük işyeri binası çizim fonksiyonu
 
-# Küçük işyeri binası çizim fonksiyonu
+
 def draw_small_building(x, y):
     building_width, building_height = 60, 75  # Küçültülmüş boyutlar
     pygame.draw.rect(pencere, small_building_color, (x, y, building_width, building_height))
@@ -121,7 +118,7 @@ def draw_small_building(x, y):
         pygame.draw.rect(pencere, black, (x + 8 + i * 18, y + 45, 11, 11), 2)  # Alt pencereler
 
 
-#YOLLARIN VE ŞERİT ÇİZGİLERİNİN KALINLIĞI, ŞERİT ÇİZGİLERİ ARASI BOŞLUK
+# YOLLARIN VE ŞERİT ÇİZGİLERİNİN KALINLIĞI, ŞERİT ÇİZGİLERİ ARASI BOŞLUK
 yol_width = 80
 serit_width = 5
 serit_gap = 45
@@ -129,80 +126,86 @@ serit_gap = 45
 
 # YOLLAR
 
-#en üstte olan yatay yol
+# en üstte olan yatay yol
 def draw_ust_yatay_road():
     pygame.draw.rect(pencere, asphalt_color, (0, 75, genislik, yol_width))  # üst yatay yol
 
-#en altta olan yatay yol
+
+# en altta olan yatay yol
 def draw_alt_yatay_road():
     pygame.draw.rect(pencere, asphalt_color, (0, 615, genislik, yol_width))  # alt yatay yol
 
-#evden çıkan en soldaki dikey yol
+
+# evden çıkan en soldaki dikey yol
 def draw_sol_dikey_road():
     pygame.draw.rect(pencere, asphalt_color, (150, 80, yol_width, yukseklik))  # sol dikey yol
 
-#köpekli kadının geçtiği yol
+
+# köpekli kadının geçtiği yol
 def draw_sag_dikey_road():
     pygame.draw.rect(pencere, asphalt_color, (875, 80, yol_width, 650))  # sağ dikey yol
-#alt kısmına yapılan ekleme minik yol
+
+
+# alt kısmına yapılan ekleme minik yol
 def draw_minikYol2():
-    pygame.draw.rect(pencere, asphalt_color,(875,730,yol_width,300))
-#sola dönüşün yasak olduğu, soldan ikinci dikey yol
+    pygame.draw.rect(pencere, asphalt_color, (875, 730, yol_width, 300))
+
+
+# sola dönüşün yasak olduğu, soldan ikinci dikey yol
 def draw_ortayol1_road():
-    pygame.draw.rect(pencere, asphalt_color, (400, 400, yol_width, 275))  # sol orta yolun dikey yolu
-#alt kısmına yapılan ekleme minik yol
+    pygame.draw.rect(pencere, asphalt_color, (400, 100, yol_width, 900))  # sol orta yolun dikey yolu
+
+
+# alt kısmına yapılan ekleme minik yol
 def draw_minikYol1():
-    pygame.draw.rect(pencere,asphalt_color,(400,650,yol_width,300))
-#yol çalışmasının olduğu yol
+    pygame.draw.rect(pencere, asphalt_color, (400, 650, yol_width, 300))
+
+
+# yol çalışmasının olduğu yol
 def draw_orta_yatay1_road():
     pygame.draw.rect(pencere, asphalt_color, (460, 400, 415, yol_width))  # sol orta yolun yatay yolu
 
-#en sağdaki dikey yol
-def draw_ortayol2_road():
-    pygame.draw.rect(pencere, asphalt_color, (1400, 225, yol_width, 450))  # sağ orta yolun dikey yolu
 
-#yukarıdan ikinci yol
+# en sağdaki dikey yol
+def draw_ortayol2_road():
+    pygame.draw.rect(pencere, asphalt_color, (1400, 100, yol_width, 900))  # sağ orta yolun dikey yolu
+
+
+# yukarıdan ikinci yol
 def draw_orta_yatay2_road():
     pygame.draw.rect(pencere, asphalt_color, (935, 225, 525, yol_width))  # sağ orta yolun yatay yolu
 
-#kavşağın çizimi
-def draw_kavsak_ortası():
-    pygame.draw.circle(pencere,havuz_mavisi,(190,650),20,0)# kavşağın ortasındaki mavi daire
-#mavi daireyi çevreleyen beyaz çizgi
-def draw_kavsakiccercevesi():
-    pygame.draw.circle(pencere,white,(190,650),20,2)#mavi dairenin etrafındaki beyaz çember
-# dairesel yol
-def draw_daireselyol():
-    pygame.draw.circle(pencere,asphalt_color,(190,650),100,0) #kavşak yolu
 
-
-
-#ŞERİT ÇİZGİLERİNİN ÇİZİLMESİ
+# ŞERİT ÇİZGİLERİNİN ÇİZİLMESİ
 
 def draw_serit_cizgileri():
-    for y in range(170, 535, serit_gap * 2):
+    for y in range(170, 600, serit_gap * 2):
         pygame.draw.rect(pencere, white, (187, y, serit_width, serit_gap))  # sol dikey yol
     for y in range(175, 600, serit_gap * 2):
         pygame.draw.rect(pencere, white, (912, y, serit_width, serit_gap))  # sağ dikey yol
-    for x in range(290, 1600, serit_gap * 2):
+    for x in range(0, 1600, serit_gap * 2):
         pygame.draw.rect(pencere, white, (x, 650, serit_gap, serit_width))  # alt yatay yol
     for x in range(0, 1600, serit_gap * 2):
         pygame.draw.rect(pencere, white, (x, 110, serit_gap, serit_width))  # üst yatay yol
-    for y in range(445, 600, serit_gap * 2):
-        pygame.draw.rect(pencere, white, (437, y, serit_width, serit_gap),)  # sağ orta yolun dikey yolu
-    for y in range(265, 600, serit_gap * 2):
+    for y in range(170, 600, serit_gap * 2):
+        pygame.draw.rect(pencere, white, (437, y, serit_width, serit_gap), )  # sağ orta yolun dikey yolu
+    for y in range(160, 600, serit_gap * 2):
         pygame.draw.rect(pencere, white, (1438, y, serit_width, serit_gap))  # sol orta yolun dikey yolu
     for x in range(460, 875, serit_gap * 2):
         pygame.draw.rect(pencere, white, (x, 436, serit_gap, serit_width))  # sol orta yolun yatay yolu
     for x in range(970, 1415, serit_gap * 2):
         pygame.draw.rect(pencere, white, (x, 262, serit_gap, serit_width))  # sağ orta yolun yatay yolu
-    for y in range(700,900,serit_gap*2):
-        pygame.draw.rect(pencere,white,(437,y,serit_width,serit_gap))   #minikyol1 in şeritleri
-    for y in range(700,900,serit_gap*2):
-        pygame.draw.rect(pencere,white,(912,y,serit_width,serit_gap))   #minikyol2 nin şeritleri
+    for y in range(700, 900, serit_gap * 2):
+        pygame.draw.rect(pencere, white, (437, y, serit_width, serit_gap))  # minikyol1 in şeritleri
+    for y in range(700, 900, serit_gap * 2):
+        pygame.draw.rect(pencere, white, (912, y, serit_width, serit_gap))  # minikyol2 nin şeritleri
+    for y in range(700, 900, serit_gap * 2):
+        pygame.draw.rect(pencere, white, (187, y, serit_width, serit_gap))  # minikyol1 in şeritleri
+    for y in range(700, 900, serit_gap * 2):
+        pygame.draw.rect(pencere, white, (1438, y, serit_width, serit_gap))  # minikyol1 in şeritleri
 
 
-#TRAFİK LEVHALARININ RESİMLERİNİN YÜKLEME ALANI
+# TRAFİK LEVHALARININ RESİMLERİNİN YÜKLEME ALANI
 
 yaya_gecidi_img = pygame.image.load("yayagecidi.png")
 tali_yol_img = pygame.image.load("yolver.png")
@@ -210,28 +213,37 @@ dur_img = pygame.image.load("durlevhasi.png")
 yol_calismasi_img = pygame.image.load("yolcalismasi.png")
 donel_kasvak = pygame.image.load("donelkavsak.png")
 unlem = pygame.image.load("unlem.png")
-duraklamakYasak= pygame.image.load("duraklamakYasak.png")
-sagaDonusYasak=pygame.image.load("sagaDonusYasak.png")
-solaDonusYasak=pygame.image.load("solaDonusYasak.png")
+duraklamakYasak = pygame.image.load("duraklamakYasak.png")
+sagaDonusYasak = pygame.image.load("sagaDonusYasak.png")
+solaDonusYasak = pygame.image.load("solaDonusYasak.png")
 
 # EKLENEN GÖRSELLERİN BOYUT AYARLAMASI
 
 scale_factor = 0.1  # Görsellerin boyutunu küçültmek için bir ölçek faktörü
-yaya_gecidi_img = pygame.transform.scale(yaya_gecidi_img, (int(yaya_gecidi_img.get_width() * scale_factor), int(yaya_gecidi_img.get_height() * scale_factor)))
-tali_yol_img = pygame.transform.scale(tali_yol_img, (int(tali_yol_img.get_width() * scale_factor), int(tali_yol_img.get_height() * scale_factor)))
+yaya_gecidi_img = pygame.transform.scale(yaya_gecidi_img, (
+int(yaya_gecidi_img.get_width() * scale_factor), int(yaya_gecidi_img.get_height() * scale_factor)))
+tali_yol_img = pygame.transform.scale(tali_yol_img, (
+int(tali_yol_img.get_width() * scale_factor), int(tali_yol_img.get_height() * scale_factor)))
 dur_img = pygame.transform.scale(dur_img, (int(dur_img.get_width() * 0.2), int(dur_img.get_height() * 0.2)))
-yol_calismasi_img = pygame.transform.scale(yol_calismasi_img, (int(yol_calismasi_img.get_width() * scale_factor), int(yol_calismasi_img.get_height() * scale_factor)))
-donel_kasvak = pygame.transform.scale(donel_kasvak, (int(donel_kasvak.get_width() * scale_factor), int(donel_kasvak.get_height() * scale_factor)))
+yol_calismasi_img = pygame.transform.scale(yol_calismasi_img, (
+int(yol_calismasi_img.get_width() * scale_factor), int(yol_calismasi_img.get_height() * scale_factor)))
+donel_kasvak = pygame.transform.scale(donel_kasvak, (
+int(donel_kasvak.get_width() * scale_factor), int(donel_kasvak.get_height() * scale_factor)))
 
-kazi_alani= pygame.transform.scale(kazi_alani,(int(kazi_alani.get_width()*scale_factor),int(kazi_alani.get_height()*scale_factor)))
-yolengel= pygame.transform.scale(yolengel,(int(yolengel.get_width()*scale_factor),int(yolengel.get_height()*scale_factor)))
-solaDonusYasak= pygame.transform.scale(solaDonusYasak,(int(solaDonusYasak.get_width()*scale_factor),int(solaDonusYasak.get_height()*scale_factor)))
-sagaDonusYasak= pygame.transform.scale(sagaDonusYasak,(int(sagaDonusYasak.get_width()*0.2),int(sagaDonusYasak.get_height()*0.2)))
+kazi_alani = pygame.transform.scale(kazi_alani, (
+int(kazi_alani.get_width() * scale_factor), int(kazi_alani.get_height() * scale_factor)))
+yolengel = pygame.transform.scale(yolengel, (int(yolengel.get_width() * 0.1), int(yolengel.get_height() * 0.1)))
+solaDonusYasak = pygame.transform.scale(solaDonusYasak, (
+int(solaDonusYasak.get_width() * scale_factor), int(solaDonusYasak.get_height() * scale_factor)))
+sagaDonusYasak = pygame.transform.scale(sagaDonusYasak,
+                                        (int(sagaDonusYasak.get_width() * 0.2), int(sagaDonusYasak.get_height() * 0.2)))
+vinc = pygame.transform.scale(vinc, (int(vinc.get_width() * 0.8), int(vinc.get_height() * 0.8)))
 
-
-#TRAFİK IŞIĞININ ÇİZİMİ 1
+# TRAFİK IŞIĞININ ÇİZİMİ 1
 
 isik_radius = 10
+
+
 # TRAFİK IŞIĞINDA IŞIK RENGİNİN DEĞİŞİMİ
 def draw_trafik_isigi(x, y, light_color):
     # Trafik ışığı çizimi
@@ -241,11 +253,12 @@ def draw_trafik_isigi(x, y, light_color):
     pygame.draw.circle(pencere, red_off if light_color != "kirmizi" else red, (x + 10, y + 50), isik_radius)
 
 
-#YAYA GEÇİTLERİNİN ÇİZDİRİLMESİ
-#Yaya geçidi çizgilerinin özellikleri
+# YAYA GEÇİTLERİNİN ÇİZDİRİLMESİ
+# Yaya geçidi çizgilerinin özellikleri
 line_height = 7  # yaya gecidi şeridinin genişliği
 cizgiler_arasi_aralik = 8
 line_width = 55
+
 
 def draw_yatay_yaya_gecidi():
     # Çizgi boyutları
@@ -257,14 +270,18 @@ def draw_yatay_yaya_gecidi():
 
 def draw_dikey_yaya_gecidi():
     # Dikey yaya geçidi çizgilerini çiz
-    for i in range(58,64):  # bir yolun genişliği 80-85 aralığında yani 5 piksel
+    for i in range(58, 64):  # bir yolun genişliği 80-85 aralığında yani 5 piksel
         yaya_gecidi = pygame.Rect(i * (line_height + cizgiler_arasi_aralik), 320, line_height,
                                   line_width)  # 300 y eksenindeki konumu
         pygame.draw.rect(pencere, white if i % 1 == 0 else asphalt_color, yaya_gecidi)
 
-#GEÇİCİ ARABANIN ÇİZDİRİLMESİ
+    # GEÇİCİ ARABANIN ÇİZDİRİLMESİ
+
+
 def draw_car(x, y, color):
     pygame.draw.rect(pencere, color, (x, y, 30, 15), border_radius=60)  # Araba gövdesi
+    pygame.draw.circle(pencere, havuz_mavisi, (x + 6, y + 7.5), 5.5)
+    pygame.draw.circle(pencere, havuz_mavisi, (x + 23, y + 7.5), 6.5)
 
 
 # Bütün Fonksiyonları Çağırdığımız ve Ana Ekranı Oluşturduğumuz MAIN Fonksiyon
@@ -280,7 +297,7 @@ def main():
 
     # NPC Arabalar
     car_x_yellow = -60  # Sarı arabanın başlangıç pozisyonu
-    car_y_yellow = 705  # Taşlı yol üzerinde olacak şekilde y konumu
+    car_y_yellow = 670  # Taşlı yol üzerinde olacak şekilde y konumu
     car_speed_yellow = 2  # Sarı arabanın hızı
 
     car_x_red = 1000  # Kırmızı arabanın başlangıç pozisyonu
@@ -319,7 +336,7 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        # Arkaplan rengini uygula
+                # Arkaplan rengini uygula
         pencere.fill(arkaplan)
 
         # Kazı Alanındaki Yer Resmini Ekrana Yazdır
@@ -340,7 +357,6 @@ def main():
         elif elapsed_time < 33:
             light_color = "kirmizi"
 
-
         car_x_red -= car_speed_red
         car_x_yellow += car_speed_yellow
         kedi_x += kedi_speed
@@ -358,24 +374,24 @@ def main():
         if kedi_x > genislik:
             kedi_x = 200
 
-        # Sağdaki Dikey Yolda Yaya Geçidinden Geçen Köpekli Kadın
+            # Sağdaki Dikey Yolda Yaya Geçidinden Geçen Köpekli Kadın
         if gidis_sol:
             npc_kopekli_abla = npc_kopekli_abla_sol
             npc_kopekli_abla_x -= npc_kopekli_abla_speed
-            if npc_kopekli_abla_x < 800:  # Sol sınır
+            if npc_kopekli_abla_x < 700:  # Sol sınır
                 gidis_sol = False
                 npc_kopekli_abla = npc_kopekli_abla_sag
         else:
             npc_kopekli_abla_x += npc_kopekli_abla_speed
-            if npc_kopekli_abla_x > 950:  # Sağ sınır
+            if npc_kopekli_abla_x > 1000:  # Sağ sınır
                 gidis_sol = True
                 npc_kopekli_abla = npc_kopekli_abla_sol
 
-        # Üst Yatay Yolda Yaya Geçidinden Geçen Yalnız Yıkık Adam
+                # Üst Yatay Yolda Yaya Geçidinden Geçen Yalnız Yıkık Adam
         if gidis_asagi:
             npc_adam = npc_adam_on
             npc_adam_y += npc_adam_speed
-            if npc_adam_y > 100:  # Aşağı sınır
+            if npc_adam_y > 200:  # Aşağı sınır
                 gidis_asagi = False
                 npc_adam = npc_adam_arka
         else:
@@ -384,7 +400,8 @@ def main():
                 gidis_asagi = True
                 npc_adam = npc_adam_on
 
-        # KÜÇÜLTÜLMÜŞ KAMYONUN DETAYLI ÇİZİMİ
+                # KÜÇÜLTÜLMÜŞ KAMYONUN DETAYLI ÇİZİMİ
+
         def draw_truck(x, y):
             # Kamyon gövdesi (turuncu) - boyut küçültüldü
             pygame.draw.rect(pencere, (255, 140, 0), (x - 90, y, 90, 35), border_radius=6)
@@ -395,7 +412,7 @@ def main():
                     brick_color = (210, 105, 30) if (i + j) % 2 == 0 else (180, 90, 20)
                     pygame.draw.rect(pencere, brick_color, (x - 85 + i * 10, y + 6 + j * 5, 10, 4))
 
-            # Saydam yük örtüsü - boyut küçültüldü
+                    # Saydam yük örtüsü - boyut küçültüldü
             overlay_surface = pygame.Surface((70, 18), pygame.SRCALPHA)  # Boyutları küçültüldü
             overlay_surface.fill((200, 200, 200, 100))
             pencere.blit(overlay_surface, (x - 85, y + 6))
@@ -432,8 +449,8 @@ def main():
             pygame.draw.circle(pencere, red, (x - 70, y + 35), 1.5)  # Sağ arka lamba
 
         # Kamyon konumu !!!KAMYONUN YER DEĞİŞİKLİĞİ İÇİN!!!
-        truck_x = 1300
-        truck_y = 653
+        truck_x = 1380
+        truck_y = 250
 
         # Fonksiyonları Ekrana Yazdırma
 
@@ -445,24 +462,21 @@ def main():
         draw_orta_yatay1_road()
         draw_ortayol2_road()
         draw_orta_yatay2_road()
-        draw_daireselyol()
-        draw_kavsak_ortası()
-        draw_kavsakiccercevesi()
         draw_minikYol1()
         draw_minikYol2()
         draw_serit_cizgileri()
 
+        pygame.draw.rect(pencere, sensor_yayagecidi, (610, 75, 5, 80))  # adamın geçtiği yaya geçidi
+        pygame.draw.rect(pencere, sensor_yayagecidi, (540, 75, 5, 80))  # adamın geçtiği yaya geçidi
+        pygame.draw.rect(pencere, sensor_yayagecidi, (875, 380, 80, 5))  # kadının geçtiği yaya geçidi
+        pygame.draw.rect(pencere, sensor_yayagecidi, (875, 310, 80, 5))  # kadının geçtiği yaya geçidi
+        pygame.draw.rect(pencere, sensor_trafikisigi,
+                         (1400, 220, 80, 2))  # sağ dikey yoldaki yatay trafik ışığı çizgisi
+        pygame.draw.rect(pencere, sensor_trafikisigi,
+                         (150, 225, 80, 2))  # sol dikey yoldaki yatay trafik ışığı çizgisi
 
-        pygame.draw.rect(pencere, white, (610, 75, 5, 80))  # adamın geçtiği yaya geçidi
-        pygame.draw.rect(pencere, white, (540, 75, 5, 80))  # adamın geçtiği yaya geçidi
-        pygame.draw.rect(pencere, white, (875, 380, 80, 5))  # kadının geçtiği yaya geçidi
-        pygame.draw.rect(pencere, white, (875, 310, 80, 5))  # kadının geçtiği yaya geçidi
-        pygame.draw.rect(pencere, white, (875, 225, 80, 2))  # sağ dikey yoldaki yatay trafik ışığı çizgisi
-        pygame.draw.rect(pencere, white, (150, 225, 80, 2))  # sol dikey yoldaki yatay trafik ışığı çizgisi
-        pygame.draw.rect(pencere, white, (150, 550, 80, 2))  # kavşaktaki dikey trafik ışığını çizgisi
-        draw_trafik_isigi(120, 505, light_color)  # kavşaktaki trafik ışığı
-        draw_trafik_isigi(120, 175, light_color)  # sol üst kesişen yolda trafik ışığı
-        draw_trafik_isigi(845, 160, light_color)  # sağ dikey yol sonundaki trafik ışığı
+        draw_trafik_isigi(235, 160, light_color)  # sol üst kesişen yolda trafik ışığı
+        draw_trafik_isigi(1487, 160, light_color)  # sağ dikey yol sonundaki trafik ışığı
 
         # Yaya Geçitlerini Ekle
         draw_yatay_yaya_gecidi()
@@ -478,36 +492,36 @@ def main():
 
         # Tabelaları Konumlarına Göre Yerleştir (şeffaflık ile)
         pencere.blit(yaya_gecidi_img, (620, 100))
-        pencere.blit(yaya_gecidi_img, (950,360))
-        pencere.blit(tali_yol_img, (800, 420))
-        pencere.blit(dur_img, (35, 700))
-        pencere.blit(donel_kasvak, (200, 700))
-        pencere.blit(yolengel,(665,440))
-        pencere.blit(solaDonusYasak,(370,530))
-        pencere.blit(solaDonusYasak, (850, 530))
-        pencere.blit(isci,(750,450))
-        pencere.blit(agac,(700,200))
+        pencere.blit(yaya_gecidi_img, (950, 360))
+        pencere.blit(dur_img, (760, 420))
+        pencere.blit(dur_img, (420, 390))
+        pencere.blit(yolengel, (665, 440))
+        pencere.blit(isci, (750, 450))
+        pencere.blit(agac, (700, 200))
         pencere.blit(agac, (500, 200))
-        pencere.blit(agac, (1400, 700))
         pencere.blit(agac, (1200, 400))
         pencere.blit(agac, (1100, 380))
+        pencere.blit(agac, (30, 300))
+        pencere.blit(agac, (30, 400))
+        pencere.blit(agac, (280, 500))
+        pencere.blit(agac, (280, 200))
 
-        #kamyonun çizimi
+        # kamyonun çizimi
         draw_truck(truck_x, truck_y)
         # Ev ve işyeri çizimleri
         # Küçük ev ve garajı çiz, evin sol alt köşeye yerleştir
-        draw_house(60, yukseklik -60 )  # Küçültülmüş ev koordinatları
-        draw_garage(155, yukseklik - 45)  # Küçültülmüş garaj konumu
+        draw_house(1330, yukseklik - 60)  # Küçültülmüş ev koordinatları
+        draw_garage(1415, yukseklik - 45)  # Küçültülmüş garaj konumu
 
         # Küçük ofis binalarını hizaladım
         draw_large_building(20, 10)  # Küçük büyük işyeri
         draw_small_building(120, 10)  # Küçük küçük işyeri
 
-
         # Dekorasyon Resimlerini ve Konumlarını Yükle
 
-        pencere.blit(cop_kutusu, (820, 350))
-
+        pencere.blit(cop_kutusu, (1350, 700))
+        pencere.blit(vinc, (620, 370))
+        pencere.blit(cop_kutusu, (200, 40))
         pygame.display.flip()
         clock.tick(60)
 
