@@ -251,7 +251,7 @@ class Tofask(pygame.sprite.Sprite):
         self.original_image = self.image
         self.rect = self.image.get_rect(topright=(1480, 810))   #ARACIN BAŞLANGIÇ KONUMU
         self.angle = 0
-        self.rotation_speed = 1.8
+        self.rotation_speed = 1
         self.direction = 0
         self.forward = pygame.math.Vector2(0, -1)
         self.active = False
